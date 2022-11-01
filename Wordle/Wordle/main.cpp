@@ -8,10 +8,10 @@
 #define OFFSET 3
 
 
-class Example : public olc::PixelGameEngine {
+class Wordle : public olc::PixelGameEngine {
     public:
-        Example() {
-            sAppName = "Example";
+        Wordle() {
+            sAppName = "Wordle";
         }
 
     public:
@@ -51,7 +51,7 @@ class Example : public olc::PixelGameEngine {
 
 
 int main(int argc, char const *argv[]) {
-	Example demo;
+	Wordle demo;
 	if (demo.Construct(250, 150, 5, 5))
 		demo.Start();
 
