@@ -26,6 +26,7 @@
 		A782D0D629115C2000E9179E /* Wordle */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Wordle; sourceTree = BUILT_PRODUCTS_DIR; };
 		A782D0D929115C2000E9179E /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		A782D0DB29115C2000E9179E /* olcPixelGameEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = olcPixelGameEngine.h; sourceTree = "<group>"; };
+		A782D0E129115CC700E9179E /* Wordle.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Wordle.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +59,7 @@
 		A782D0D829115C2000E9179E /* Wordle */ = {
 			isa = PBXGroup;
 			children = (
+				A782D0E129115CC700E9179E /* Wordle.entitlements */,
 				A782D0D929115C2000E9179E /* main.cpp */,
 				A782D0DB29115C2000E9179E /* olcPixelGameEngine.h */,
 			);
@@ -268,6 +270,7 @@
 		A782D0DF29115C2000E9179E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Wordle/Wordle.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 37PPCZ7B59;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -278,6 +281,7 @@
 		A782D0E029115C2000E9179E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Wordle/Wordle.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 37PPCZ7B59;
 				ENABLE_HARDENED_RUNTIME = YES;
