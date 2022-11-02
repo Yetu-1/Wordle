@@ -37,10 +37,11 @@ class Wordle : public olc::PixelGameEngine {
     void DrawFrame()
     {
         DrawString(103, 10, "Wordle", olc::WHITE);
+        DrawLine(0, 22, ScreenWidth(), 22, olc::DARK_GREY);
 
         std::string arry[6] = {"W", "O", "R", "D", "L", "E"};
         int pos_x = ((ScreenWidth() - (BOX_WIDTH + OFFSET)*6)/2) - 5;
-        int pos_y = 30;
+        int pos_y = 33;
         int i = 0;
         square_t b_type = DEFAULT;
         int random_val;
@@ -48,7 +49,7 @@ class Wordle : public olc::PixelGameEngine {
         {
             random_val = i % 5;
             if(arry[random_val] == "W" || arry[random_val] == "R")
-                b_type = WRONG_POS;
+                b_type = CORRECT_POS;
             else
                 b_type = DEFAULT;
             
