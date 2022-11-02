@@ -2,10 +2,12 @@
 #include "olcPixelGameEngine.h"
 #include <string>
 #include <string.h>
+#include <vector>
 
 #define BOX_WIDTH 13
 #define BOX_HEIGHT 13
 #define OFFSET 3
+using namespace std;
 
 enum square_t
 {
@@ -22,13 +24,26 @@ class Wordle : public olc::PixelGameEngine {
         }
 
     public:
+    vector<pair< string, square_t >> input_word = {
+        {"H", CORRECT_POS},
+        {"M", WRONG},
+        {"O", WRONG_POS},
+        {"L", CORRECT_POS},
+        {"L", WRONG_POS},
+    };
+        square_t box_status[30];
+        vector<string> word = {"H", "E", "L", "L", "O"};
+        
         bool OnUserCreate() override {
             // Called once at the start, so create things here
+            //word[1] = "M";
+            
             return true;
         }
 
         bool OnUserUpdate(float fElapsedTime) override {
             Clear(olc::BLACK);
+            isEqual();
             DrawFrame();
             FillRect(GetMouseX(), GetMouseY(), 1, 1);
             return true;
@@ -54,8 +69,8 @@ class Wordle : public olc::PixelGameEngine {
                 b_type = DEFAULT;
             
             pos_x += (BOX_WIDTH + 3);
-            DrawBox(pos_x, pos_y, b_type);
-            DrawString(pos_x + 3, pos_y + 3, arry[random_val], olc::WHITE);
+            DrawBox(pos_x, pos_y, box_status[i]);
+            DrawString(pos_x + 3, pos_y + 3, word[random_val], olc::WHITE);
             i++;
             if(!(i % 5))
             {
@@ -83,6 +98,25 @@ class Wordle : public olc::PixelGameEngine {
                 break;
         }
         
+    }
+    
+    void isEqual()
+    {
+        int i = 0;
+        for(auto letter : input_word)
+        {
+            if(letter.first == word[i])
+            {
+                letter.second = CORRECT_POS;
+                box_status[i] = letter.second;
+            }
+            else if(letter.first != word[i])
+            {
+                letter.second = WRONG_POS;
+                box_status[i] = letter.second;
+            }
+            i++;
+        }
     }
 };
 
