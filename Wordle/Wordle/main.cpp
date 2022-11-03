@@ -7,6 +7,15 @@
 #define BOX_WIDTH 13
 #define BOX_HEIGHT 13
 #define OFFSET 3
+#define START_Y 33
+
+
+#define N_BUTTON_WIDTH 12
+#define N_BUTTON_HEIGHT 15
+
+#define S_BUTTON_WIDTH 20
+#define S_BUTTON_HEIGHT 15
+
 using namespace std;
 
 enum square_t
@@ -24,6 +33,11 @@ class Wordle : public olc::PixelGameEngine {
         }
 
     public:
+    
+    vector<pair< string, int >> buttons ={
+        {"A", 0}, {"B", 0}, {"C", 0}, {"D", 0}, {"E", 0}, {"F", 0}, {"G", 0}, {"H", 0}, {"I", 0}, {"J", 0}, {"K", 0}, {"L", 0}, {"M", 0}, {"N", 0}, {"O", 0}, {"P", 0}, {"Q", 0}, {"R", 0}, {"S", 0}, {"->", 1}, {"T", 0}, {"U", 0}, {"V", 0}, {"W", 0}, {"X", 0}, {"Y", 0}, {"Z", 0}, {"-", 1}
+    };
+    
     vector<pair< string, square_t >> input_word = {
         {"H", CORRECT_POS},
         {"M", WRONG},
@@ -35,9 +49,6 @@ class Wordle : public olc::PixelGameEngine {
         vector<string> word = {"H", "E", "L", "L", "O"};
         
         bool OnUserCreate() override {
-            // Called once at the start, so create things here
-            //word[1] = "M";
-            
             return true;
         }
 
@@ -51,23 +62,19 @@ class Wordle : public olc::PixelGameEngine {
         
     void DrawFrame()
     {
-        DrawString(103, 10, "Wordle", olc::WHITE);
-        DrawLine(0, 22, ScreenWidth(), 22, olc::DARK_GREY);
+        // Draw Game Frame elements
+        DrawString(158, 10, "Wordle", olc::WHITE);
+        DrawLine(0, START_Y-10, ScreenWidth(), START_Y-10, olc::DARK_GREY);
 
-        std::string arry[6] = {"W", "O", "R", "D", "L", "E"};
         int pos_x = ((ScreenWidth() - (BOX_WIDTH + OFFSET)*6)/2) - 5;
-        int pos_y = 33;
+        int pos_y = START_Y + 10;
         int i = 0;
-        square_t b_type = DEFAULT;
         int random_val;
+        //DrawKeyboard(100, 170);
+        // Draw Boxes
         while(i < 30)
         {
             random_val = i % 5;
-            if(arry[random_val] == "W" || arry[random_val] == "R")
-                b_type = CORRECT_POS;
-            else
-                b_type = DEFAULT;
-            
             pos_x += (BOX_WIDTH + 3);
             DrawBox(pos_x, pos_y, box_status[i]);
             DrawString(pos_x + 3, pos_y + 3, word[random_val], olc::WHITE);
@@ -100,6 +107,18 @@ class Wordle : public olc::PixelGameEngine {
         
     }
     
+    void DrawButton(int pos_x, int pos_y, string letter, int button_type)
+    {
+        if(button_type == 1)
+            FillRect(pos_x, pos_y, S_BUTTON_WIDTH, S_BUTTON_HEIGHT, olc::DARK_GREY);
+        else
+            FillRect(pos_x, pos_y, N_BUTTON_WIDTH, N_BUTTON_HEIGHT, olc::DARK_GREY);
+
+        DrawString(pos_x + 2, pos_y + 3, letter, olc::WHITE);
+    }
+    
+
+    
     void isEqual()
     {
         int i = 0;
@@ -123,7 +142,7 @@ class Wordle : public olc::PixelGameEngine {
 
 int main(int argc, char const *argv[]) {
 	Wordle demo;
-	if (demo.Construct(250, 150, 5, 5))
+	if (demo.Construct(360, 250, 3, 3))
 		demo.Start();
 
 	return 0;
