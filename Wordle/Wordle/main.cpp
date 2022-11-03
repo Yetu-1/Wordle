@@ -70,7 +70,7 @@ class Wordle : public olc::PixelGameEngine {
         int pos_y = START_Y + 10;
         int i = 0;
         int random_val;
-        //DrawKeyboard(100, 170);
+        DrawKeyboard(100, 170);
         // Draw Boxes
         while(i < 30)
         {
@@ -117,7 +117,29 @@ class Wordle : public olc::PixelGameEngine {
         DrawString(pos_x + 2, pos_y + 3, letter, olc::WHITE);
     }
     
+    void DrawKeyboard(int pos_x, int pos_y)
+    {
+        int i = 0;
+        int start = pos_x;
+        while(i < buttons.size())
+        {
+            DrawButton(pos_x, pos_y, buttons[i].first, buttons[i].second);
 
+            if(i == 10)
+            {
+                pos_y += N_BUTTON_HEIGHT + 3;
+                pos_x = start + (N_BUTTON_WIDTH/2);
+            }
+            else if(i == 18)
+            {
+                pos_y += N_BUTTON_HEIGHT + 3;
+                pos_x = start;
+            }
+                
+            pos_x += N_BUTTON_WIDTH + 3;
+            i++;
+        }
+    }
     
     void isEqual()
     {
