@@ -78,7 +78,7 @@ class Wordle : public olc::PixelGameEngine
         int i = 0;
         int random_val;
         DrawKeyboard(KEYBOARD_X, KEYBOARD_Y);
-        // Draw Boxes
+        // Draw Grid  - should probably be function of it's own
         while(i < 30)
         {
             random_val = i % 5;
@@ -111,6 +111,13 @@ class Wordle : public olc::PixelGameEngine
                 FillRect(pos_x, pos_y, BOX_WIDTH, BOX_HEIGHT, olc::VERY_DARK_GREY);
                 break;
         }
+        
+        /* notes:
+            DrawString(pos_x + 3, pos_y + 3, input_string[random_val], olc::WHITE); thinking of adding the draw string function here and having an
+            array for all the positions on the grid and then using that to determine which letter should appear on each box every frame. Every time
+            the enter button is pressed the input string should be cleared but the previous letters on the grid should not depend on what is in the
+            input string
+         */
         
     }
     
@@ -183,12 +190,23 @@ class Wordle : public olc::PixelGameEngine
             {
                 if(string_index < 5)
                 {
-                    input_string[string_index] = buttons[i].first;
-                    string_index++;
+                    if (buttons[i].first == "<-")
+                        input_string[string_index -= 1] = "";
+                    else if (buttons[i].first == "->")
+                        break;
+                    else
+                    {
+                        input_string[string_index] = buttons[i].first;
+                        string_index++;
+                    }
                 }
-                
-                if(string_index == 5)
+                /* notes:
+                    this needs better implementation
+                 */
+                if(string_index == 5 && buttons[i].first == "->")
                     string_index = 0;
+                else if (string_index == 5 && buttons[i].first == "<-")
+                    input_string[string_index -= 1] = "";
             }
             
             if(i == 10)
