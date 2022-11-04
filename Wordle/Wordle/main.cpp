@@ -19,6 +19,8 @@
 #define KEYBOARD_X 100
 #define KEYBOARD_Y 170
 
+#define INPUT_STRING_SIZE 6
+
 using namespace std;
 
 enum square_t
@@ -49,7 +51,7 @@ class Wordle : public olc::PixelGameEngine
         {"L", CORRECT_POS},
         {"L", WRONG_POS},
     };
-    string input_string[6] = {};
+    string input_string[INPUT_STRING_SIZE] = {};
     
     square_t box_status[30];
     vector<string> word = {"H", "E", "L", "L", "O"};
@@ -178,7 +180,7 @@ class Wordle : public olc::PixelGameEngine
     
     void scanKeyboard(){
         int i = 0;
-        static int string_index = 0;
+        static uint8_t string_index = 0;
         int pos_x = KEYBOARD_X;
         int pos_y = KEYBOARD_Y;
         
@@ -188,7 +190,7 @@ class Wordle : public olc::PixelGameEngine
         {
             if( scanButton(pos_x, pos_y, buttons[i].second) )
             {
-                if(string_index < 5)
+                if(string_index < INPUT_STRING_SIZE - 1)
                 {
                     if (buttons[i].first == "<-")
                         input_string[string_index -= 1] = "";
@@ -204,9 +206,13 @@ class Wordle : public olc::PixelGameEngine
                     this needs better implementation
                  */
                 if(string_index == 5 && buttons[i].first == "->")
+                {
                     string_index = 0;
-                else if (string_index == 5 && buttons[i].first == "<-")
+                    memset(input_string, 0, sizeof(input_string));
+                }
+                else if (string_index == 5 && buttons[i].first == "<-")// noticed that if the backspace button is pressed more that it should, a thread error appears look into this
                     input_string[string_index -= 1] = "";
+                    
             }
             
             if(i == 10)
