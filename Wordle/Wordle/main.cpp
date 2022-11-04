@@ -26,7 +26,8 @@ enum square_t
     WRONG
 };
 
-class Wordle : public olc::PixelGameEngine {
+class Wordle : public olc::PixelGameEngine
+{
     public:
         Wordle() {
             sAppName = "Wordle";
@@ -34,31 +35,37 @@ class Wordle : public olc::PixelGameEngine {
 
     public:
     
-    vector<pair< string, int >> buttons ={
-        {"A", 0}, {"B", 0}, {"C", 0}, {"D", 0}, {"E", 0}, {"F", 0}, {"G", 0}, {"H", 0}, {"I", 0}, {"J", 0}, {"K", 0}, {"L", 0}, {"M", 0}, {"N", 0}, {"O", 0}, {"P", 0}, {"Q", 0}, {"R", 0}, {"S", 0}, {"->", 1}, {"T", 0}, {"U", 0}, {"V", 0}, {"W", 0}, {"X", 0}, {"Y", 0}, {"Z", 0}, {"-", 1}
+    vector<pair<string, int>> buttons ={
+        {"A", 0}, {"B", 0}, {"C", 0}, {"D", 0}, {"E", 0}, {"F", 0}, {"G", 0}, {"H", 0}, {"I", 0}, {"J", 0}, {"K", 0}, {"L", 0}, {"M", 0}, {"N", 0}, {"O", 0}, {"P", 0}, {"Q", 0}, {"R", 0}, {"S", 0}, {"->", 1}, {"T", 0}, {"U", 0}, {"V", 0}, {"W", 0}, {"X", 0}, {"Y", 0}, {"Z", 0}, {"<-", 1}
     };
     
-    vector<pair< string, square_t >> input_word = {
+    vector<pair<string, square_t>> input_word = {
         {"H", CORRECT_POS},
         {"M", WRONG},
         {"O", WRONG_POS},
         {"L", CORRECT_POS},
         {"L", WRONG_POS},
     };
-        square_t box_status[30];
-        vector<string> word = {"H", "E", "L", "L", "O"};
         
-        bool OnUserCreate() override {
-            return true;
-        }
+    square_t box_status[30];
+    vector<string> word = {"H", "E", "L", "L", "O"};
+    
+    bool OnUserCreate() override {
+        return true;
+    }
 
-        bool OnUserUpdate(float fElapsedTime) override {
-            Clear(olc::BLACK);
-            isEqual();
-            DrawFrame();
-            FillRect(GetMouseX(), GetMouseY(), 1, 1);
-            return true;
-        }
+    bool OnUserUpdate(float fElapsedTime) override {
+        Clear(olc::BLACK);
+        if(scanButton(10, 30, 0))
+            FillRect(10, 30, N_BUTTON_WIDTH, N_BUTTON_HEIGHT, olc::DARK_GREEN);
+        else
+            DrawButton(10, 30, "U", 0);
+        
+        isEqual();
+        DrawFrame();
+        FillRect(GetMouseX(), GetMouseY(), 1, 1);
+        return true;
+    }
         
     void DrawFrame()
     {
@@ -77,7 +84,7 @@ class Wordle : public olc::PixelGameEngine {
             random_val = i % 5;
             pos_x += (BOX_WIDTH + 3);
             DrawBox(pos_x, pos_y, box_status[i]);
-            DrawString(pos_x + 3, pos_y + 3, word[random_val], olc::WHITE);
+            DrawString(pos_x + 3, pos_y + 3, input_word[random_val].first, olc::WHITE);
             i++;
             if(!(i % 5))
             {
@@ -133,13 +140,32 @@ class Wordle : public olc::PixelGameEngine {
             else if(i == 18)
             {
                 pos_y += N_BUTTON_HEIGHT + 3;
-                pos_x = start;
+                pos_x = start - 8;
             }
                 
             pos_x += N_BUTTON_WIDTH + 3;
+            
+            if(i == 19)
+                pos_x += 8;
             i++;
         }
     }
+    int scanButton(int x, int y, int button_type)
+    {
+        int mouse_x = GetMouseX();
+        int mouse_y = GetMouseY();
+        
+        if(mouse_x >= x & mouse_x < (x + N_BUTTON_WIDTH))
+        {
+            if(mouse_y >= y & mouse_y < (y + N_BUTTON_HEIGHT))
+            {
+                if(GetMouse(0).bHeld)
+                    return 1;
+            }
+        }
+        return 0;
+    }
+
     
     void isEqual()
     {
