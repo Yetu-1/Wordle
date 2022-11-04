@@ -16,6 +16,9 @@
 #define S_BUTTON_WIDTH 20
 #define S_BUTTON_HEIGHT 15
 
+#define KEYBOARD_X 100
+#define KEYBOARD_Y 170
+
 using namespace std;
 
 enum square_t
@@ -46,7 +49,8 @@ class Wordle : public olc::PixelGameEngine
         {"L", CORRECT_POS},
         {"L", WRONG_POS},
     };
-        
+    string input_string[6] = {};
+    
     square_t box_status[30];
     vector<string> word = {"H", "E", "L", "L", "O"};
     
@@ -56,11 +60,7 @@ class Wordle : public olc::PixelGameEngine
 
     bool OnUserUpdate(float fElapsedTime) override {
         Clear(olc::BLACK);
-        if(scanButton(10, 30, 0))
-            FillRect(10, 30, N_BUTTON_WIDTH, N_BUTTON_HEIGHT, olc::DARK_GREEN);
-        else
-            DrawButton(10, 30, "U", 0);
-        
+        scanKeyboard();
         isEqual();
         DrawFrame();
         FillRect(GetMouseX(), GetMouseY(), 1, 1);
@@ -77,14 +77,14 @@ class Wordle : public olc::PixelGameEngine
         int pos_y = START_Y + 10;
         int i = 0;
         int random_val;
-        DrawKeyboard(100, 170);
+        DrawKeyboard(KEYBOARD_X, KEYBOARD_Y);
         // Draw Boxes
         while(i < 30)
         {
             random_val = i % 5;
             pos_x += (BOX_WIDTH + 3);
             DrawBox(pos_x, pos_y, box_status[i]);
-            DrawString(pos_x + 3, pos_y + 3, input_word[random_val].first, olc::WHITE);
+            DrawString(pos_x + 3, pos_y + 3, input_string[random_val], olc::WHITE);
             i++;
             if(!(i % 5))
             {
@@ -155,17 +155,60 @@ class Wordle : public olc::PixelGameEngine
         int mouse_x = GetMouseX();
         int mouse_y = GetMouseY();
         
-        if(mouse_x >= x & mouse_x < (x + N_BUTTON_WIDTH))
+        int b_width = (button_type == 0) ? N_BUTTON_WIDTH : S_BUTTON_WIDTH;
+        int b_height = (button_type == 0) ? N_BUTTON_HEIGHT : S_BUTTON_HEIGHT;
+        
+        if(mouse_x >= x & mouse_x < (x + b_width))
         {
-            if(mouse_y >= y & mouse_y < (y + N_BUTTON_HEIGHT))
+            if(mouse_y >= y & mouse_y < (y + b_height))
             {
-                if(GetMouse(0).bHeld)
+                if(GetMouse(0).bPressed)
                     return 1;
             }
         }
         return 0;
     }
-
+    
+    void scanKeyboard(){
+        int i = 0;
+        static int string_index = 0;
+        int pos_x = KEYBOARD_X;
+        int pos_y = KEYBOARD_Y;
+        
+        int start = pos_x;
+        
+        while(i < buttons.size())
+        {
+            if( scanButton(pos_x, pos_y, buttons[i].second) )
+            {
+                if(string_index < 5)
+                {
+                    input_string[string_index] = buttons[i].first;
+                    string_index++;
+                }
+                
+                if(string_index == 5)
+                    string_index = 0;
+            }
+            
+            if(i == 10)
+            {
+                pos_y += N_BUTTON_HEIGHT + 3;
+                pos_x = start + (N_BUTTON_WIDTH/2);
+            }
+            else if(i == 18)
+            {
+                pos_y += N_BUTTON_HEIGHT + 3;
+                pos_x = start - 8;
+            }
+                
+            pos_x += N_BUTTON_WIDTH + 3;
+            
+            if(i == 19)
+                pos_x += 8;
+            i++;
+        }
+    }
     
     void isEqual()
     {
