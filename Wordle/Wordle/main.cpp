@@ -44,6 +44,9 @@ class Wordle : public olc::PixelGameEngine
         {"A", 0}, {"B", 0}, {"C", 0}, {"D", 0}, {"E", 0}, {"F", 0}, {"G", 0}, {"H", 0}, {"I", 0}, {"J", 0}, {"K", 0}, {"L", 0}, {"M", 0}, {"N", 0}, {"O", 0}, {"P", 0}, {"Q", 0}, {"R", 0}, {"S", 0}, {"->", 1}, {"T", 0}, {"U", 0}, {"V", 0}, {"W", 0}, {"X", 0}, {"Y", 0}, {"Z", 0}, {"<-", 1}
     };
     
+    string grid_letters[30] = {};
+    int grid_idx = 0;
+    
     vector<pair<string, square_t>> input_word = {
         {"H", CORRECT_POS},
         {"M", WRONG},
@@ -86,7 +89,7 @@ class Wordle : public olc::PixelGameEngine
             random_val = i % 5;
             pos_x += (BOX_WIDTH + 3);
             DrawBox(pos_x, pos_y, box_status[i]);
-            DrawString(pos_x + 3, pos_y + 3, input_string[random_val], olc::WHITE);
+            DrawString(pos_x + 3, pos_y + 3, grid_letters[i], olc::WHITE);
             i++;
             if(!(i % 5))
             {
@@ -96,6 +99,7 @@ class Wordle : public olc::PixelGameEngine
         }
 
     }
+    
     
     void DrawBox(int pos_x, int pos_y, square_t box_type)
     {
@@ -115,7 +119,8 @@ class Wordle : public olc::PixelGameEngine
         }
         
         /* notes:
-            DrawString(pos_x + 3, pos_y + 3, input_string[random_val], olc::WHITE); thinking of adding the draw string function here and having an
+            DrawString(pos_x
+         + 3, pos_y + 3, input_string[random_val], olc::WHITE); thinking of adding the draw string function here and having an
             array for all the positions on the grid and then using that to determine which letter should appear on each box every frame. Every time
             the enter button is pressed the input string should be cleared but the previous letters on the grid should not depend on what is in the
             input string
@@ -180,38 +185,38 @@ class Wordle : public olc::PixelGameEngine
     
     void scanKeyboard(){
         int i = 0;
-        static uint8_t string_index = 0;
+        static uint8_t word_counter = 0;
         int pos_x = KEYBOARD_X;
         int pos_y = KEYBOARD_Y;
         
         int start = pos_x;
-        
+        bool inWord = true;
         while(i < buttons.size())
         {
             if( scanButton(pos_x, pos_y, buttons[i].second) )
             {
-                if(string_index < INPUT_STRING_SIZE - 1)
+                if(inWord)
                 {
                     if (buttons[i].first == "<-")
-                        input_string[string_index -= 1] = "";
-                    else if (buttons[i].first == "->")
-                        break;
-                    else
                     {
-                        input_string[string_index] = buttons[i].first;
-                        string_index++;
+                        grid_letters[grid_idx -= 1] = "";
+                    }
+                    else if (buttons[i].first == "->" && word_counter == 5)
+                    {
+                        inWord = false; // this assumes that the person doesn't input a word that does not exist
+                        word_counter = 0;
+                    }
+                    else if (word_counter < 5)
+                    {
+                        grid_letters[grid_idx] = buttons[i].first;
+                        grid_idx++;
+                        word_counter++;
                     }
                 }
-                /* notes:
-                    this needs better implementation
-                 */
-                if(string_index == 5 && buttons[i].first == "->")
+                else
                 {
-                    string_index = 0;
-                    memset(input_string, 0, sizeof(input_string));
+                    inWord = true;
                 }
-                else if (string_index == 5 && buttons[i].first == "<-")// noticed that if the backspace button is pressed more that it should, a thread error appears look into this
-                    input_string[string_index -= 1] = "";
                     
             }
             
