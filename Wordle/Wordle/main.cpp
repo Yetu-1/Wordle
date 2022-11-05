@@ -45,28 +45,19 @@ class Wordle : public olc::PixelGameEngine
     };
     
     string grid_letters[30] = {};
-    int grid_idx = 0;
-    
-    vector<pair<string, square_t>> input_word = {
-        {"H", CORRECT_POS},
-        {"M", WRONG},
-        {"O", WRONG_POS},
-        {"L", CORRECT_POS},
-        {"L", WRONG_POS},
-    };
-    string input_string[INPUT_STRING_SIZE] = {};
-    
+    uint8_t grid_idx = 0;
     square_t box_status[30];
+
     vector<string> word = {"H", "E", "L", "L", "O"};
     
     bool OnUserCreate() override {
+        memset(box_status, 0, sizeof(box_status));
         return true;
     }
 
     bool OnUserUpdate(float fElapsedTime) override {
         Clear(olc::BLACK);
         scanKeyboard();
-        isEqual();
         DrawFrame();
         FillRect(GetMouseX(), GetMouseY(), 1, 1);
         return true;
@@ -119,7 +110,7 @@ class Wordle : public olc::PixelGameEngine
                 FillRect(pos_x, pos_y, BOX_WIDTH, BOX_HEIGHT, olc::DARK_YELLOW);
                 break;
             default:
-                FillRect(pos_x, pos_y, BOX_WIDTH, BOX_HEIGHT, olc::VERY_DARK_GREY);
+                FillRect(pos_x, pos_y, BOX_WIDTH, BOX_HEIGHT, olc::DARK_GREY);
                 break;
         }
     }
@@ -196,6 +187,7 @@ class Wordle : public olc::PixelGameEngine
                     if (buttons[i].first == "<-")
                     {
                         grid_letters[grid_idx -= 1] = "";
+                        word_counter--;
                     }
                     else if (buttons[i].first == "->" && word_counter == 5)
                     {
@@ -209,9 +201,17 @@ class Wordle : public olc::PixelGameEngine
                         word_counter++;
                     }
                 }
-                else
+                
+                if(!inWord)
                 {
                     inWord = true;
+                    if(isEqual())
+                    {
+                        grid_idx = 0;
+                        memset(grid_letters, 0, sizeof(grid_letters));
+                        memset(box_status, 0, sizeof(box_status));
+                    }
+                        
                 }
                     
             }
@@ -235,23 +235,44 @@ class Wordle : public olc::PixelGameEngine
         }
     }
     
-    void isEqual()
+    bool isEqual()
     {
-        int i = 0;
-        for(auto letter : input_word)
+        int j = 0;
+        bool equal_flag = true;
+        
+        for(int i = (grid_idx - 5); i < (grid_idx); i++)
         {
-            if(letter.first == word[i])
+            if(grid_letters[i] == word[j])
             {
-                letter.second = CORRECT_POS;
-                box_status[i] = letter.second;
+                box_status[i] = CORRECT_POS;
             }
-            else if(letter.first != word[i])
+            else if(grid_letters[i] != word[j] && exist(grid_letters[i]))
             {
-                letter.second = WRONG_POS;
-                box_status[i] = letter.second;
+                box_status[i] = WRONG_POS;
+                equal_flag = false;
             }
-            i++;
+            else if(!exist(grid_letters[i]))
+            {
+                box_status[i] = WRONG;
+                equal_flag = false;
+            }
+            j++;
         }
+        return equal_flag;
+    }
+    int exist(string letter)
+    {
+        int j = 0;
+        
+        for(int i = (grid_idx - 5); i < (grid_idx); i++)
+        {
+            if(letter == word[j])
+            {
+               return 1;
+            }
+            j++;
+        }
+        return 0;
     }
 };
 
