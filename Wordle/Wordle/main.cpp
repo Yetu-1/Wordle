@@ -80,10 +80,17 @@ class Wordle : public olc::PixelGameEngine
 
         int pos_x = ((ScreenWidth() - (BOX_WIDTH + OFFSET)*6)/2) - 5;
         int pos_y = START_Y + 10;
+        
+        DrawKeyboard(KEYBOARD_X, KEYBOARD_Y);
+        
+        DrawGrid(pos_x, pos_y);
+    }
+    
+    void DrawGrid(int pos_x, int pos_y)
+    {
         int i = 0;
         int random_val;
-        DrawKeyboard(KEYBOARD_X, KEYBOARD_Y);
-        // Draw Grid  - should probably be function of it's own
+        
         while(i < 30)
         {
             random_val = i % 5;
@@ -97,9 +104,7 @@ class Wordle : public olc::PixelGameEngine
                 pos_x = ((ScreenWidth() - (BOX_WIDTH + OFFSET)*6)/2) - 5;
             }
         }
-
     }
-    
     
     void DrawBox(int pos_x, int pos_y, square_t box_type)
     {
@@ -117,15 +122,6 @@ class Wordle : public olc::PixelGameEngine
                 FillRect(pos_x, pos_y, BOX_WIDTH, BOX_HEIGHT, olc::VERY_DARK_GREY);
                 break;
         }
-        
-        /* notes:
-            DrawString(pos_x
-         + 3, pos_y + 3, input_string[random_val], olc::WHITE); thinking of adding the draw string function here and having an
-            array for all the positions on the grid and then using that to determine which letter should appear on each box every frame. Every time
-            the enter button is pressed the input string should be cleared but the previous letters on the grid should not depend on what is in the
-            input string
-         */
-        
     }
     
     void DrawButton(int pos_x, int pos_y, string letter, int button_type)
