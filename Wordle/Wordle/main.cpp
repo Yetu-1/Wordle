@@ -31,6 +31,12 @@ enum square_t
     WRONG
 };
 
+struct GRID
+{
+    string letter = "";
+    square_t box_status = DEFAULT;
+};
+
 class Wordle : public olc::PixelGameEngine
 {
     public:
@@ -43,15 +49,13 @@ class Wordle : public olc::PixelGameEngine
     vector<pair<string, int>> buttons ={
         {"A", 0}, {"B", 0}, {"C", 0}, {"D", 0}, {"E", 0}, {"F", 0}, {"G", 0}, {"H", 0}, {"I", 0}, {"J", 0}, {"K", 0}, {"L", 0}, {"M", 0}, {"N", 0}, {"O", 0}, {"P", 0}, {"Q", 0}, {"R", 0}, {"S", 0}, {"->", 1}, {"T", 0}, {"U", 0}, {"V", 0}, {"W", 0}, {"X", 0}, {"Y", 0}, {"Z", 0}, {"<-", 1}
     };
-    
-    string grid_letters[30] = {};
-    uint8_t grid_idx = 0;
-    square_t box_status[30];
 
-    vector<string> word = {"H", "E", "L", "L", "O"};
+    GRID grid[30];
+    uint8_t grid_idx = 0;
+
+    vector<string> word = {"P", "E", "L", "L", "O"};
     
     bool OnUserCreate() override {
-        memset(box_status, 0, sizeof(box_status));
         return true;
     }
 
@@ -86,8 +90,8 @@ class Wordle : public olc::PixelGameEngine
         {
             random_val = i % 5;
             pos_x += (BOX_WIDTH + 3);
-            DrawBox(pos_x, pos_y, box_status[i]);
-            DrawString(pos_x + 3, pos_y + 3, grid_letters[i], olc::WHITE);
+            DrawBox(pos_x, pos_y, grid[i].box_status);
+            DrawString(pos_x + 3, pos_y + 3, grid[i].letter, olc::WHITE);
             i++;
             if(!(i % 5))
             {
@@ -184,9 +188,9 @@ class Wordle : public olc::PixelGameEngine
             {
                 if(inWord)
                 {
-                    if (buttons[i].first == "<-")
+                    if (buttons[i].first == "<-") // ###### notes: pressing backspace mulitple times breaks the code #####
                     {
-                        grid_letters[grid_idx -= 1] = "";
+                        grid[grid_idx -= 1].letter = "";
                         word_counter--;
                     }
                     else if (buttons[i].first == "->" && word_counter == 5)
@@ -196,7 +200,7 @@ class Wordle : public olc::PixelGameEngine
                     }
                     else if (word_counter < 5)
                     {
-                        grid_letters[grid_idx] = buttons[i].first;
+                        grid[grid_idx].letter = buttons[i].first;
                         grid_idx++;
                         word_counter++;
                     }
@@ -208,8 +212,7 @@ class Wordle : public olc::PixelGameEngine
                     if(isEqual())
                     {
                         grid_idx = 0;
-                        memset(grid_letters, 0, sizeof(grid_letters));
-                        memset(box_status, 0, sizeof(box_status));
+                        memset(grid, 0, sizeof(grid));
                     }
                         
                 }
@@ -242,18 +245,18 @@ class Wordle : public olc::PixelGameEngine
         
         for(int i = (grid_idx - 5); i < (grid_idx); i++)
         {
-            if(grid_letters[i] == word[j])
+            if(grid[i].letter == word[j])
             {
-                box_status[i] = CORRECT_POS;
+                grid[i].box_status = CORRECT_POS;
             }
-            else if(grid_letters[i] != word[j] && exist(grid_letters[i]))
+            else if(grid[i].letter != word[j] && exist(grid[i].letter))
             {
-                box_status[i] = WRONG_POS;
+                grid[i].box_status = WRONG_POS;
                 equal_flag = false;
             }
-            else if(!exist(grid_letters[i]))
+            else if(!exist(grid[i].letter))
             {
-                box_status[i] = WRONG;
+                grid[i].box_status = WRONG;
                 equal_flag = false;
             }
             j++;
