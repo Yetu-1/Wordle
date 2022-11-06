@@ -1,3 +1,8 @@
+/**
+ * @file    main.cpp
+ * @author  David Salihu
+ * @date    1-11-2022
+ */
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
 #include <string>
