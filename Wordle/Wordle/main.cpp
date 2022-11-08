@@ -226,16 +226,12 @@ class Wordle : public olc::PixelGameEngine
                     if(isEqual())
                     {
                         points++;
-                        grid_idx = 0;
-                        memset(grid, 0, sizeof(grid));
-                        get_word_flag = true;
+                        resetGame();
                     }
                     // check if last try
                     if(grid_idx > 25 && !isEqual())
                     {
-                        grid_idx = 0;
-                        memset(grid, 0, sizeof(grid));
-                        get_word_flag = true;
+                        resetGame();
                     }
                         
                 }
@@ -261,6 +257,12 @@ class Wordle : public olc::PixelGameEngine
         }
     }
     
+    void resetGame()
+    {
+        grid_idx = 0;
+        memset(grid, 0, sizeof(grid));
+        get_word_flag = true;
+    }
     
     bool isEqual()
     {
