@@ -53,7 +53,7 @@ class Wordle : public olc::PixelGameEngine
         }
 
     public:
-    
+    int points = 0;
     bool get_word_flag = true;
     bool first_word = true;
     
@@ -81,7 +81,8 @@ class Wordle : public olc::PixelGameEngine
     void DrawFrame()
     {
         // Draw Game Frame elements
-        DrawString(158, 10, "Wordle", olc::WHITE);
+        DrawString((ScreenWidth() - 202), 10, "Wordle", olc::WHITE);
+        DrawString((ScreenWidth() - 110), 10, "Points:" + to_string(points), olc::WHITE);
         DrawLine(0, START_Y-10, ScreenWidth(), START_Y-10, olc::DARK_GREY);
 
         int pos_x = ((ScreenWidth() - (BOX_WIDTH + OFFSET)*6)/2) - 5;
@@ -90,6 +91,8 @@ class Wordle : public olc::PixelGameEngine
         DrawKeyboard(KEYBOARD_X, KEYBOARD_Y);
         
         DrawGrid(pos_x, pos_y);
+        
+
     }
     
     void DrawGrid(int pos_x, int pos_y)
@@ -222,6 +225,14 @@ class Wordle : public olc::PixelGameEngine
                     inWord = true;
                     if(isEqual())
                     {
+                        points++;
+                        grid_idx = 0;
+                        memset(grid, 0, sizeof(grid));
+                        get_word_flag = true;
+                    }
+                    // check if last try
+                    if(grid_idx > 25 && !isEqual())
+                    {
                         grid_idx = 0;
                         memset(grid, 0, sizeof(grid));
                         get_word_flag = true;
@@ -249,6 +260,7 @@ class Wordle : public olc::PixelGameEngine
             i++;
         }
     }
+    
     
     bool isEqual()
     {
