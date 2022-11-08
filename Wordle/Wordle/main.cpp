@@ -8,6 +8,9 @@
 #include <string>
 #include <string.h>
 #include <vector>
+#include <fstream>
+#include <iostream>
+
 
 #define BOX_WIDTH 13
 #define BOX_HEIGHT 13
@@ -38,7 +41,7 @@ enum square_t
 
 struct GRID
 {
-    string letter = "";
+    char letter = ' ';
     square_t box_status = DEFAULT;
 };
 
@@ -51,20 +54,23 @@ class Wordle : public olc::PixelGameEngine
 
     public:
     
-    vector<pair<string, int>> buttons ={
-        {"A", 0}, {"B", 0}, {"C", 0}, {"D", 0}, {"E", 0}, {"F", 0}, {"G", 0}, {"H", 0}, {"I", 0}, {"J", 0}, {"K", 0}, {"L", 0}, {"M", 0}, {"N", 0}, {"O", 0}, {"P", 0}, {"Q", 0}, {"R", 0}, {"S", 0}, {"->", 1}, {"T", 0}, {"U", 0}, {"V", 0}, {"W", 0}, {"X", 0}, {"Y", 0}, {"Z", 0}, {"<-", 1}
+    bool get_word_flag = true;
+    bool first_word = true;
+    
+    vector<pair<char, int>> buttons ={
+        {'A', 0}, {'B', 0}, {'C', 0}, {'D', 0}, {'E', 0}, {'F', 0}, {'G', 0}, {'H', 0}, {'I', 0}, {'J', 0}, {'K', 0}, {'L', 0}, {'M', 0}, {'N', 0}, {'O', 0}, {'P', 0}, {'Q', 0}, {'R', 0}, {'S', 0}, {'>', 1}, {'T', 0}, {'U', 0}, {'V', 0}, {'W', 0}, {'X', 0}, {'Y', 0}, {'Z', 0}, {'<', 1}
     };
 
     GRID grid[30];
     uint8_t grid_idx = 0;
-
-    vector<string> word = {"P", "E", "L", "L", "O"};
+    string input_word = "";
     
     bool OnUserCreate() override {
         return true;
     }
 
     bool OnUserUpdate(float fElapsedTime) override {
+        getRandomWord();
         Clear(olc::BLACK);
         scanKeyboard();
         DrawFrame();
@@ -96,7 +102,7 @@ class Wordle : public olc::PixelGameEngine
             random_val = i % 5;
             pos_x += (BOX_WIDTH + 3);
             DrawBox(pos_x, pos_y, grid[i].box_status);
-            DrawString(pos_x + 3, pos_y + 3, grid[i].letter, olc::WHITE);
+            DrawString(pos_x + 3, pos_y + 3, string(1, grid[i].letter), olc::WHITE);
             i++;
             if(!(i % 5))
             {
@@ -140,7 +146,7 @@ class Wordle : public olc::PixelGameEngine
         int start = pos_x;
         while(i < buttons.size())
         {
-            DrawButton(pos_x, pos_y, buttons[i].first, buttons[i].second);
+            DrawButton(pos_x, pos_y, string(1,buttons[i].first), buttons[i].second);
 
             if(i == 10)
             {
@@ -193,12 +199,12 @@ class Wordle : public olc::PixelGameEngine
             {
                 if(inWord)
                 {
-                    if (buttons[i].first == "<-") // ###### notes: pressing backspace mulitple times breaks the code #####
+                    if (buttons[i].first == '<') // ###### notes: pressing backspace mulitple times breaks the code #####
                     {
-                        grid[grid_idx -= 1].letter = "";
+                        grid[grid_idx -= 1].letter = ' ';
                         word_counter--;
                     }
-                    else if (buttons[i].first == "->" && word_counter == 5)
+                    else if (buttons[i].first == '>' && word_counter == 5)
                     {
                         inWord = false; // this assumes that the person doesn't input a word that does not exist
                         word_counter = 0;
@@ -218,6 +224,7 @@ class Wordle : public olc::PixelGameEngine
                     {
                         grid_idx = 0;
                         memset(grid, 0, sizeof(grid));
+                        get_word_flag = true;
                     }
                         
                 }
@@ -250,11 +257,11 @@ class Wordle : public olc::PixelGameEngine
         
         for(int i = (grid_idx - 5); i < (grid_idx); i++)
         {
-            if(grid[i].letter == word[j])
+            if(grid[i].letter == input_word[j])
             {
                 grid[i].box_status = CORRECT_POS;
             }
-            else if(grid[i].letter != word[j] && exist(grid[i].letter))
+            else if(grid[i].letter != input_word[j] && exist(grid[i].letter))
             {
                 grid[i].box_status = WRONG_POS;
                 equal_flag = false;
@@ -268,13 +275,14 @@ class Wordle : public olc::PixelGameEngine
         }
         return equal_flag;
     }
-    int exist(string letter)
+    
+    int exist(char letter)
     {
         int j = 0;
         
         for(int i = (grid_idx - 5); i < (grid_idx); i++)
         {
-            if(letter == word[j])
+            if(letter == input_word[j])
             {
                return 1;
             }
@@ -282,13 +290,60 @@ class Wordle : public olc::PixelGameEngine
         }
         return 0;
     }
+    
+    void getRandomWord(){
+        // File pointer
+        fstream fin;
+        // Open File
+        fin.open("Words.csv", ios::in);
+        
+        int rollnum = (rand() % 3) + 1;
+        int collnum = (rand() % 8) + 1;
+    
+        vector<string> row_of_words;
+        string line, word;
+        
+        while(get_word_flag)
+        {
+            row_of_words.clear();
+            
+            // read an entire row and
+            // store it in a string variable 'line'
+            getline(fin, line);
+            
+            // used for breaking words
+            stringstream s(line);
+            
+            // read every column data of a row and
+            // store it in a string variable, 'word'
+            while (getline(s, word, ',')) {
+                
+                // add all the column data
+                // of a row to a vector
+                row_of_words.push_back(word);
+            }
+            
+            // convert string to integer for comparision
+            int roll = stoi(row_of_words[0]);
+            
+            if ( roll == rollnum)
+            {
+                input_word = row_of_words[collnum];
+                // using transform() function and ::toupper in STL
+                transform(input_word.begin(), input_word.end(), input_word.begin(), ::toupper);
+                cout<<"Word: "<< input_word<<endl;
+                get_word_flag = false;
+            }
+        }
+
+    }
 };
 
 
 int main(int argc, char const *argv[]) {
-	Wordle demo;
-	if (demo.Construct(360, 250, 3, 3))
-		demo.Start();
+    Wordle demo;
+    if (demo.Construct(360, 250, 3, 3))
+        demo.Start();
 
-	return 0;
+    return 0;
 }
